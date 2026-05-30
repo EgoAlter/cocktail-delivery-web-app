@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Order Confirmed — Cocktail Delivery{% endblock %}
+
+{% block content %}
+<div class="confirmation-card">
+  <div class="confirmation-icon">&#10003;</div>
+  <h1>Order placed!</h1>
+  <p class="confirmation-sub">Order #{{ order.id }} is confirmed and on its way.</p>
+
+  <div class="confirmation-details">
+    <div class="detail-row">
+      <span>Delivering to</span>
+      <span>{{ order.delivery_address }}</span>
+    </div>
+    <div class="detail-row">
+      <span>Status</span>
+      <span class="status-badge status-{{ order.status }}">{{ order.status_label }}</span>
+    </div>
+  </div>
+
+  <table class="summary-table">
+    {% for item in order.items %}
+    <tr>
+      <td>{{ item.product.name }}</td>
+      <td class="qty">× {{ item.quantity }}</td>
+      <td class="price">${{ "%.2f"|format(item.subtotal) }}</td>
+    </tr>
+    {% endfor %}
+    <tr class="total-row">
+      <td colspan="2">Total</td>
+      <td class="price"><strong>${{ "%.2f"|format(order.total_price) }}</strong></td>
+    </tr>
+  </table>
+
+  <a href="{{ url_for('menu.index') }}" class="btn btn-primary">Back to menu</a>
+</div>
+{% endblock %}

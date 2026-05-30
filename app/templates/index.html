@@ -21,7 +21,9 @@
         <p class="product-description">{{ product.description or '' }}</p>
         <div class="product-footer">
           <span class="product-price">${{ "%.2f"|format(product.price) }}</span>
-          <a href="{{ url_for('cart.add', product_id=product.id) }}" class="btn btn-primary">Add to cart</a>
+          <form method="POST" action="{{ url_for('cart.add', product_id=product.id) }}">
+            <button type="submit" class="btn btn-primary">Add to cart</button>
+          </form>
         </div>
       </div>
     </div>

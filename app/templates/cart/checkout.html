@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Checkout — Cocktail Delivery{% endblock %}
+
+{% block content %}
+<h1>Checkout</h1>
+
+<div class="checkout-layout">
+
+  <div class="checkout-form">
+    <h2>Delivery address</h2>
+    <form method="POST" action="{{ url_for('cart.checkout') }}">
+      <div class="form-group">
+        <label for="address">Full address</label>
+        <textarea id="address" name="address" rows="3" required
+                  placeholder="Street, city, postcode"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Place order</button>
+    </form>
+  </div>
+
+  <div class="order-summary">
+    <h2>Order summary</h2>
+    <table class="summary-table">
+      {% for item in items %}
+      <tr>
+        <td>{{ item.product.name }}</td>
+        <td class="qty">× {{ item.quantity }}</td>
+        <td class="price">${{ "%.2f"|format(item.subtotal) }}</td>
+      </tr>
+      {% endfor %}
+      <tr class="total-row">
+        <td colspan="2">Total</td>
+        <td class="price"><strong>${{ "%.2f"|format(total) }}</strong></td>
+      </tr>
+    </table>
+  </div>
+
+</div>
+{% endblock %}
