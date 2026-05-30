@@ -1,5 +1,5 @@
 from flask import Flask
-from app.extensions import db, mail
+from app.extensions import db, mail, login_manager, migrate
 from app.config import Config
 
 
@@ -9,6 +9,10 @@ def create_app(config_class=Config):
 
     db.init_app(app)
     mail.init_app(app)
+    login_manager.init_app(app)
+    migrate.init_app(app, db)
+
+    from . import models  # noqa: F401 — registers models with SQLAlchemy metadata
 
     from app.blueprints.auth import auth_bp
     from app.blueprints.menu import menu_bp
