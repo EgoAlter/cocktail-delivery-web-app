@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Cocktail Delivery{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+
+  <nav class="navbar">
+    <a class="navbar-brand" href="{{ url_for('menu.index') }}">Cocktail Delivery</a>
+    <ul class="navbar-links">
+      <li><a href="{{ url_for('menu.index') }}">Menu</a></li>
+      {% if current_user.is_authenticated %}
+        <li><a href="{{ url_for('cart.view') }}">Cart</a></li>
+        {% if current_user.is_staff %}
+          <li><a href="{{ url_for('dashboard.orders') }}">Dashboard</a></li>
+        {% endif %}
+        <li><a href="{{ url_for('auth.logout') }}">Logout ({{ current_user.name }})</a></li>
+      {% else %}
+        <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+        <li><a href="{{ url_for('auth.register') }}">Register</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <p>&copy; 2026 Cocktail Delivery</p>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

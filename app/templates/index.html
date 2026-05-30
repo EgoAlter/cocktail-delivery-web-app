@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Menu — Cocktail Delivery{% endblock %}
+
+{% block content %}
+<h1>Our Cocktails</h1>
+
+{% if products %}
+  <div class="product-grid">
+    {% for product in products %}
+    <div class="product-card">
+      {% if product.image_url %}
+        <img src="{{ product.image_url }}" alt="{{ product.name }}">
+      {% else %}
+        <div class="product-image-placeholder"></div>
+      {% endif %}
+      <div class="product-info">
+        <h2>{{ product.name }}</h2>
+        {% if product.category %}
+          <span class="product-category">{{ product.category }}</span>
+        {% endif %}
+        <p class="product-description">{{ product.description or '' }}</p>
+        <div class="product-footer">
+          <span class="product-price">${{ "%.2f"|format(product.price) }}</span>
+          <a href="{{ url_for('cart.add', product_id=product.id) }}" class="btn btn-primary">Add to cart</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="empty-state">No cocktails available right now. Check back soon!</p>
+{% endif %}
+{% endblock %}
