@@ -277,6 +277,73 @@ h1 { font-size: 1.75rem; margin-bottom: 1.5rem; }
 .confirmation-card .summary-table { margin-bottom: 1.5rem; text-align: left; }
 .confirmation-card .btn { width: 100%; }
 
+/* ── Dashboard ────────────────────────────────────────────── */
+.dashboard-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+.dashboard-header h1 { margin-bottom: 0; }
+.back-link { font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem; }
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.stat-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+.stat-pill {
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.stat-pill:hover { text-decoration: none; border-color: var(--accent); color: var(--text); }
+.stat-pill.active { border-color: var(--accent); color: var(--accent); }
+.stat-pill span { font-weight: 700; }
+
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.orders-table th,
+.orders-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.orders-table th { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; }
+.orders-table tbody tr:hover { background: var(--surface); }
+
+.status-lg { font-size: 0.9rem; padding: 0.35rem 1rem; }
+
+.detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 1.5rem;
+  align-items: start;
+}
+@media (max-width: 720px) { .detail-layout { grid-template-columns: 1fr; } }
+
+.detail-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+.detail-card h2 { font-size: 1rem; margin-bottom: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.detail-sidebar .detail-card:last-child { margin-bottom: 0; }
+
+.address-text { color: var(--text); line-height: 1.7; white-space: pre-line; }
+.text-muted { color: var(--text-muted); font-size: 0.9rem; }
+
 /* ── Footer ───────────────────────────────────────────────── */
 .footer {
   text-align: center;

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Order #{{ order.id }} — Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+  <div>
+    <a href="{{ url_for('dashboard.orders') }}" class="back-link">&larr; All orders</a>
+    <h1>Order #{{ order.id }}</h1>
+  </div>
+  <span class="status-badge status-{{ order.status }} status-lg">{{ order.status_label }}</span>
+</div>
+
+<div class="detail-layout">
+
+  <div class="detail-main">
+    <div class="detail-card">
+      <h2>Items</h2>
+      <table class="summary-table">
+        {% for item in order.items %}
+        <tr>
+          <td>{{ item.product.name }}</td>
+          <td class="qty">× {{ item.quantity }}</td>
+          <td class="price">${{ "%.2f"|format(item.subtotal) }}</td>
+        </tr>
+        {% endfor %}
+        <tr class="total-row">
+          <td colspan="2">Total</td>
+          <td class="price"><strong>${{ "%.2f"|format(order.total_price) }}</strong></td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="detail-card">
+      <h2>Delivery address</h2>
+      <p class="address-text">{{ order.delivery_address }}</p>
+    </div>
+  </div>
+
+  <div class="detail-sidebar">
+    <div class="detail-card">
+      <h2>Customer</h2>
+      <p>{{ order.user.name }}</p>
+      <p class="text-muted">{{ order.user.email }}</p>
+    </div>
+
+    <div class="detail-card">
+      <h2>Timestamps</h2>
+      <div class="detail-row">
+        <span>Placed</span>
+        <span>{{ order.created_at.strftime('%d %b %Y, %H:%M') }}</span>
+      </div>
+      <div class="detail-row">
+        <span>Updated</span>
+        <span>{{ order.updated_at.strftime('%d %b %Y, %H:%M') }}</span>
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <h2>Update status</h2>
+      <form method="POST" action="{{ url_for('dashboard.update_status', order_id=order.id) }}">
+        <div class="form-group">
+          <select name="status">
+            {% for s in valid_statuses %}
+            <option value="{{ s }}" {% if order.status == s %}selected{% endif %}>
+              {{ s.replace('_', ' ').title() }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
