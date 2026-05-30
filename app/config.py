@@ -13,6 +13,4 @@ class Config:
     MAIL_PASSWORD       = os.environ.get('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_USERNAME', 'noreply@cocktaildelivery.com')
 
-    # Render (and Heroku) provide postgres:// but SQLAlchemy 2.0 requires postgresql://
-    _db_url = os.environ.get('DATABASE_URL', 'sqlite:///cocktails.db')
-    SQLALCHEMY_DATABASE_URI = _db_url.replace('postgres://', 'postgresql://', 1)
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///cocktails.db')

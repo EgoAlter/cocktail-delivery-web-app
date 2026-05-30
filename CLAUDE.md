@@ -4,14 +4,18 @@
 
 A cocktail delivery web app built with Flask. Customers browse a menu, add items to a cart, check out, and receive email confirmation. Staff can view and manage orders via a dashboard.
 
+**Live:** https://egoalter.pythonanywhere.com/
+
 ## Tech stack
 
 - **Python** 3.14 / **Flask** 3.1.3
 - **SQLAlchemy** 2.0 via Flask-SQLAlchemy 3.1 (ORM)
-- **Flask-Mail** 0.10 (transactional email)
-- **Flask-Login** — not yet installed, needed for auth (add to requirements.txt when implementing)
-- **Database** — SQLite locally (`sqlite:///cocktails.db`), configurable via `DATABASE_URL`
+- **Flask-Migrate** (Alembic) for database migrations
+- **Flask-Login** for auth
+- **Flask-Mail** for transactional email (Mailtrap for testing)
+- **Database** — SQLite everywhere (local dev and PythonAnywhere production)
 - **Frontend** — Jinja2 templates, vanilla JS, plain CSS (no framework)
+- **Hosting** — PythonAnywhere (free tier)
 
 ## Project structure
 
@@ -20,24 +24,22 @@ run.py                  # entry point: calls create_app() and runs the dev serve
 app/
   __init__.py           # app factory: create_app() wires extensions + blueprints
   config.py             # Config class reads from .env
-  extensions.py         # shared db and mail instances (import from here, never re-create)
-  models.py             # SQLAlchemy models (empty — needs implementing)
+  extensions.py         # shared db, mail, login_manager, migrate instances
+  models.py             # User, Product, Order, OrderItem
+  email.py              # send_order_confirmed / send_order_delivered
   blueprints/
-    auth.py             # login, logout, register routes
-    menu.py             # browse products
-    cart.py             # cart, checkout, confirmation
-    dashboard.py        # staff order management
-    api.py              # JSON endpoints (reserved)
-  templates/            # Jinja2 HTML — mirrors blueprint names
+    auth.py             # register, login, logout
+    menu.py             # home page / product listing
+    cart.py             # add, remove, update, checkout, confirmation
+    dashboard.py        # staff order list, detail, status update
+    api.py              # JSON endpoints (reserved for future use)
+  templates/            # Jinja2 HTML — mirrors blueprint names + emails/
   static/
-    css/main.css
-    js/cart.js, menu.js, dashboard.js
-seed.py                 # populate DB with sample data (empty — implement alongside models)
+    css/main.css        # dark theme, all styles
+    js/                 # cart.js, menu.js, dashboard.js (reserved)
+seed.py                 # populates DB with 6 cocktails + 1 staff user
+migrations/             # Alembic migration files
 ```
-
-## Known structural issue
-
-`app/__init__.py` is currently missing — the `create_app` factory lives in `app/blueprints/__init__.py` with a comment saying it belongs at `app/__init__.py`. This means `run.py` (`from app import create_app`) will fail. **Fix before running:** move the factory to `app/__init__.py`.
 
 ## Local setup
 
@@ -47,58 +49,72 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Create `.env` in the project root (already gitignored):
+Create `.env` in the project root (gitignored):
 ```
 SECRET_KEY=<random string>
 DATABASE_URL=sqlite:///cocktails.db
-MAIL_SERVER=smtp.gmail.com
-MAIL_USERNAME=<your email>
-MAIL_PASSWORD=<app password>
+MAIL_SERVER=sandbox.smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=<mailtrap username>
+MAIL_PASSWORD=<mailtrap password>
 ```
 
-Run the dev server:
 ```bash
+flask --app run:app db upgrade
+python seed.py
 python run.py
 ```
+
+Staff login: `admin@cocktails.com` / `admin1234`
 
 ## Architecture conventions
 
 - **Factory pattern** — always use `create_app()`, never instantiate `Flask` at module level.
-- **Extensions** — import `db` and `mail` from `app.extensions`, never re-create them.
-- **Blueprints** — one per feature area; register them inside `create_app()` in `app/__init__.py`.
-- **Models** — all in `app/models.py`; import `db` from `app.extensions`.
-- **No circular imports** — blueprints import models inside route functions or at the top of the blueprint file, not at module level in `__init__.py`.
+- **Extensions** — import `db`, `mail`, `login_manager`, `migrate` from `app.extensions`.
+- **Blueprints** — one per feature area; all registered inside `create_app()` in `app/__init__.py`.
+- **Models** — all in `app/models.py`; `db` imported from `app.extensions`.
+- **Email** — use `send_order_confirmed(order)` / `send_order_delivered(order)` from `app.email`. Failures are caught and logged — never crash the request.
+- **Cart** — session-based (`session['cart']`), not stored in DB until checkout.
+- **staff_required** — decorator in `dashboard.py`, returns 403 for non-staff.
 
 ## Build status
 
 | Area | Status |
 |---|---|
 | App factory + config | Done |
-| Blueprint scaffold | Done (routes empty) |
-| Database models | Not started |
-| Auth (login/register) | Not started — needs Flask-Login |
-| Menu / product listing | Not started |
-| Cart + checkout | Not started |
-| Staff dashboard | Not started |
-| Email notifications | Not started |
-| Templates | Empty stubs |
-| Seed data | Empty stub |
-| Tests | Empty directory |
+| Database models (User, Product, Order, OrderItem) | Done |
+| Migrations | Done |
+| Auth (register, login, logout) | Done |
+| Menu / product listing | Done |
+| Cart (add, remove, update, checkout, confirmation) | Done |
+| Staff dashboard (order list, detail, status update) | Done |
+| Email notifications (confirmed + delivered) | Done |
+| CSS / dark theme | Done |
+| Seed data | Done |
+| Deployed to PythonAnywhere | Done |
+| Tests | Not started |
 
-## Suggested build order
+## Deployment (PythonAnywhere)
 
-1. Fix `app/__init__.py` placement
-2. Install Flask-Login, Flask-Migrate — add to `requirements.txt`
-3. Define models (`User`, `Product`, `Order`, `OrderItem`)
-4. Run migrations, write seed data
-5. Auth blueprint (register, login, logout)
-6. Menu blueprint (list products, product detail)
-7. Cart blueprint (add/remove, checkout, confirmation)
-8. Dashboard blueprint (staff order list, order detail, status update)
-9. Email notifications (order confirmed, order delivered)
-10. Frontend polish (CSS, JS)
+WSGI file at `/var/www/egoalter_pythonanywhere_com_wsgi.py`:
+```python
+import sys
+import os
+
+path = '/home/EgoAlter/cocktail-delivery-web-app'
+if path not in sys.path:
+    sys.path.insert(0, path)
+
+from dotenv import load_dotenv
+load_dotenv(os.path.join(path, '.env'))
+
+from run import app as application
+```
+
+Virtualenv set in Web tab to the `cocktail-env` virtualenv path.
+
+To redeploy after changes: `git pull` in PythonAnywhere console → Web tab → Reload.
 
 ## GitHub
 
 Remote: `https://github.com/EgoAlter/cocktail-delivery-web-app`
-Branch strategy: feature branches → PR → merge to `main`.

@@ -2,14 +2,14 @@
 
 A full-stack cocktail delivery web app built with Flask. Customers browse a menu, add items to a cart, check out, and receive email confirmation. Staff manage and update orders via a dashboard.
 
-**Live demo:** [YOUR-APP-URL]
+**Live demo:** https://egoalter.pythonanywhere.com/
 
 ---
 
 ## Features
 
 - Browse a menu of cocktails with category tags and pricing
-- Add items to a session-based cart, update quantities, remove items
+- Session-based cart — add items, update quantities, remove items
 - Checkout with a delivery address — order saved to database
 - Email notifications: order confirmed on checkout, delivery notification when staff marks delivered
 - Staff dashboard: view all orders, filter by status, update order status
@@ -21,12 +21,11 @@ A full-stack cocktail delivery web app built with Flask. Customers browse a menu
 | Layer | Technology |
 |---|---|
 | Backend | Python 3 / Flask 3 |
-| Database | MySQL (production) / SQLite (local dev) |
-| ORM | SQLAlchemy 2 via Flask-SQLAlchemy |
+| Database | SQLite (via SQLAlchemy) |
 | Migrations | Flask-Migrate (Alembic) |
 | Auth | Flask-Login |
 | Email | Flask-Mail |
-| Server | Gunicorn |
+| Hosting | PythonAnywhere |
 
 ## Local setup
 
@@ -72,6 +71,31 @@ App runs at `http://127.0.0.1:5000`
 | Staff | admin@cocktails.com | admin1234 |
 
 Register any email to create a customer account.
+
+## Deployment (PythonAnywhere)
+
+1. Clone the repo into your PythonAnywhere home directory
+2. Create a virtualenv and `pip install -r requirements.txt`
+3. Create a `.env` file with your `SECRET_KEY`, `DATABASE_URL`, and mail credentials
+4. Run `flask --app run:app db upgrade` then `python seed.py`
+5. Configure the WSGI file and set the virtualenv path in the Web tab
+6. Reload — app is live at `yourusername.pythonanywhere.com`
+
+WSGI file content:
+
+```python
+import sys
+import os
+
+path = '/home/YOUR_USERNAME/cocktail-delivery-web-app'
+if path not in sys.path:
+    sys.path.insert(0, path)
+
+from dotenv import load_dotenv
+load_dotenv(os.path.join(path, '.env'))
+
+from run import app as application
+```
 
 ## Project structure
 
