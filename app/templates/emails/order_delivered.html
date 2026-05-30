@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0d0d0d; color: #e8e8e8; margin: 0; padding: 0; }
+    .wrapper { max-width: 560px; margin: 40px auto; background: #1a1a1a; border-radius: 8px; overflow: hidden; }
+    .header { background: #111; padding: 28px 32px; border-bottom: 2px solid #27ae60; }
+    .header h1 { margin: 0; font-size: 1.3rem; color: #27ae60; }
+    .body { padding: 28px 32px; }
+    .body p { margin: 0 0 16px; line-height: 1.6; }
+    .icon { font-size: 2.5rem; text-align: center; margin: 8px 0 20px; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    td { padding: 10px 4px; border-bottom: 1px solid #2e2e2e; font-size: 0.95rem; }
+    .qty { text-align: center; color: #888; }
+    .price { text-align: right; }
+    .total td { border-bottom: none; border-top: 2px solid #2e2e2e; font-weight: 700; padding-top: 14px; }
+    .footer { padding: 20px 32px; font-size: 0.8rem; color: #555; border-top: 1px solid #2e2e2e; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="header">
+      <h1>Cocktail Delivery &mdash; Delivered!</h1>
+    </div>
+    <div class="body">
+      <div class="icon">&#127378;</div>
+      <p>Hi {{ order.user.name }},</p>
+      <p>Your order <strong>#{{ order.id }}</strong> has been delivered. Enjoy your cocktails!</p>
+
+      <table>
+        {% for item in order.items %}
+        <tr>
+          <td>{{ item.product.name }}</td>
+          <td class="qty">&times; {{ item.quantity }}</td>
+          <td class="price">${{ "%.2f"|format(item.subtotal) }}</td>
+        </tr>
+        {% endfor %}
+        <tr class="total">
+          <td colspan="2">Total paid</td>
+          <td class="price">${{ "%.2f"|format(order.total_price) }}</td>
+        </tr>
+      </table>
+
+      <p>Hope to see you again soon!</p>
+    </div>
+    <div class="footer">
+      You're receiving this because you placed an order at Cocktail Delivery.
+    </div>
+  </div>
+</body>
+</html>

@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from flask_login import login_required, current_user
 from app.extensions import db
 from app.models import Order
+from app.email import send_order_delivered
 
 dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
@@ -73,5 +74,9 @@ def update_status(order_id):
 
     order.status = new_status
     db.session.commit()
+
+    if new_status == Order.STATUS_DELIVERED:
+        send_order_delivered(order)
+
     flash(f'Order #{order.id} updated to {order.status_label}.', 'success')
     return redirect(url_for('dashboard.order_detail', order_id=order_id))

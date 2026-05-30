@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from flask_login import login_required, current_user
 from app.extensions import db
 from app.models import Product, Order, OrderItem
+from app.email import send_order_confirmed
 
 cart_bp = Blueprint('cart', __name__, url_prefix='/cart')
 
@@ -121,6 +122,7 @@ def checkout():
 
         db.session.commit()
         save_cart({})  # clear cart
+        send_order_confirmed(order)
 
         flash('Order placed successfully!', 'success')
         return redirect(url_for('cart.confirmation', order_id=order.id))
